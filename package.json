@@ -1,5 +1,22 @@
 {
   "dependencies": {
-    "exceljs": "^4.4.0"
+    "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
+    "mssql": "^11.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "eslint": "^9.25.1",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   }
 }
