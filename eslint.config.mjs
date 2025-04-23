@@ -4,7 +4,11 @@ import tseslint from 'typescript-eslint';
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig([
-  js.configs.recommended,
+  {
+    ignores: ['eslint.config.mjs'],
+  },
+
+    js.configs.recommended,
 
   {
     files: ['**/*.ts'],
@@ -12,9 +16,9 @@ export default defineConfig([
       parser: tseslint.parser,
       parserOptions: {
         project: './tsconfig.json',
-        tsconfigRootDir: process.cwd(), // ensures ESLint resolves the path correctly
+        tsconfigRootDir: process.cwd(), // <-- uses 'process'
       },
-      globals: globals.node,
+      globals: globals.node, // <-- makes 'process' defined
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
