@@ -1,10 +1,18 @@
-// src/index.ts
 import http from 'http';
+import { getPool } from './db';
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     if (req.url === '/' && req.method === 'GET') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Northwind Excel API is running' }));
+        try {
+            const pool = await getPool();
+            const result = await pool.request().query('SELECT TOP 5 * FROM Products');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(result.recordset));
+        } catch (err) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Database error', details: err }));
+            console.error(err);
+        }
     } else {
         res.writeHead(404);
         res.end('Not Found');
