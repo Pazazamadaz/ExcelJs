@@ -1,4 +1,5 @@
 import { getPool } from '../db';
+import {mapToGeneralType} from "../utils/dataTypeMapper";
 
 export const getAllTableNames = async (): Promise<string[]> => {
     const pool = await getPool();
@@ -31,8 +32,9 @@ export const getTableSchema = async (tableName: string) => {
         table: tableName,
         columns: result.recordset.map(col => ({
             name: col.name,
-            type: col.type,
+            type: mapToGeneralType(col.type),
+            originalType: col.type,
             nullable: col.nullable === 'YES',
-        })),
+        }))
     };
 };
