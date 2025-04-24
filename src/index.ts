@@ -1,8 +1,13 @@
 import http from 'http';
+import url from 'url';
 import { getPool } from './db';
+import { getAllTableNames, getTableSchema } from './services/tableServices';
 
 const server = http.createServer(async (req, res) => {
-    if (req.url === '/' && req.method === 'GET') {
+    const parsedUrl = url.parse(req.url || '', true);
+    const method = req.method || 'GET';
+
+    if (parsedUrl.pathname === '/' && method === 'GET') {
         try {
             const pool = await getPool();
             const result = await pool.request().query('SELECT TOP 5 * FROM Products');
@@ -13,7 +18,39 @@ const server = http.createServer(async (req, res) => {
             res.end(JSON.stringify({ error: 'Database error', details: err }));
             console.error(err);
         }
-    } else {
+    }
+
+    else if (parsedUrl.pathname === '/tables' && method === 'GET') {
+        try {
+            const tables = await getAllTableNames();
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ tables }));
+        } catch (err) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Failed to fetch table list', details: err }));
+        }
+    }
+
+    else if (parsedUrl.pathname === '/tableSchema' && method === 'GET') {
+        const tableName = parsedUrl.query.table as string;
+
+        if (!tableName) {
+            res.writeHead(400);
+            res.end(JSON.stringify({ error: 'Missing table query parameter' }));
+            return;
+        }
+
+        try {
+            const schema = await getTableSchema(tableName);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(schema));
+        } catch (err) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Failed to fetch schema', details: err }));
+        }
+    }
+
+    else {
         res.writeHead(404);
         res.end('Not Found');
     }
