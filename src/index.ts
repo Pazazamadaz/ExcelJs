@@ -2,6 +2,7 @@ import http from 'http';
 import url from 'url';
 import { getPool } from './db';
 import { getAllTableNames, getTableSchema } from './services/tableServices';
+import {generateExcelReport} from "./services/reportServices";
 
 const server = http.createServer(async (req, res) => {
     const parsedUrl = url.parse(req.url || '', true);
@@ -47,6 +48,29 @@ const server = http.createServer(async (req, res) => {
         } catch (err) {
             res.writeHead(500);
             res.end(JSON.stringify({ error: 'Failed to fetch schema', details: err }));
+        }
+    }
+
+    else if (parsedUrl.pathname === '/report' && method === 'GET') {
+        const tableName = parsedUrl.query.table as string;
+
+        if (!tableName) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing table query parameter' }));
+            return;
+        }
+
+        try {
+            const buffer = await generateExcelReport(tableName);
+
+            res.writeHead(200, {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition': `attachment; filename=${tableName}_report.xlsx`,
+            });
+            res.end(buffer);
+        } catch (err) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Failed to generate report', details: err }));
         }
     }
 
