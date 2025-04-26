@@ -1,7 +1,7 @@
 export interface Filter {
     column: string;
     operator: 'eq' | 'ne' | 'gt' | 'lt' | 'gte' | 'lte' | 'like';
-    value: any;
+    value: unknown;
 }
 
 export interface ReportRequest {
