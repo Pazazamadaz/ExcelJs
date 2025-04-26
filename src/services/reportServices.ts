@@ -37,6 +37,15 @@ export const generateExcelReport = async (
         query += ` WHERE ${conditions.join(' AND ')}`;
     }
 
+    if (request.orderBys && request.orderBys.length > 0) {
+        const orders = request.orderBys.map(orderBy => {
+            const direction = orderBy.order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+            return `${orderBy.column} ${direction}`;
+        });
+
+        query += ` ORDER BY ${orders.join(', ')}`;
+    }
+
     const result = await pool.request().query(query);
 
     const workbook = new Excel.Workbook();

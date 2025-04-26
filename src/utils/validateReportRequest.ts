@@ -33,5 +33,20 @@ export const validateReportRequest = (request: ReportRequest): string[] => {
         }
     }
 
+    if (request.orderBys) {
+        if (!Array.isArray(request.orderBys)) {
+            errors.push('OrderBys must be an array.');
+        } else {
+            request.orderBys.forEach((orderBy, index) => {
+                if (typeof orderBy.column !== 'string') {
+                    errors.push(`OrderBy at index ${index} has invalid column.`);
+                }
+                if (orderBy.order !== 'asc' && orderBy.order !== 'desc') {
+                    errors.push(`OrderBy at index ${index} must have order 'asc' or 'desc'.`);
+                }
+            });
+        }
+    }
+
     return errors;
 };
