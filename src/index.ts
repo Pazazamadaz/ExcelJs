@@ -4,6 +4,7 @@ import { getPool } from './db';
 import { getAllTableNames, getTableSchema } from './services/tableServices';
 import {generateExcelReport} from "./services/reportServices";
 import { ReportRequest } from './types/reportRequest';
+import {validateReportRequest} from "./utils/validateReportRequest";
 
 const server = http.createServer(async (req, res) => {
     const parsedUrl = url.parse(req.url || '', true);
@@ -62,6 +63,13 @@ const server = http.createServer(async (req, res) => {
         req.on('end', async () => {
             try {
                 const requestBody: ReportRequest = JSON.parse(body);
+
+                const validationErrors = validateReportRequest(requestBody);
+                if (validationErrors.length > 0) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid request', details: validationErrors }));
+                    return;
+                }
 
                 const buffer = await generateExcelReport(requestBody);
 
