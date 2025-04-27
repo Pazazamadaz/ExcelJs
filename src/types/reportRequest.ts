@@ -13,9 +13,14 @@ export interface OrderBy {
     order: OrderDirection;
 }
 
+export interface Group {
+    column: string;
+}
+
 export interface ReportRequest {
     tableName: string;
     columns?: string[];
     filters?: Filter[];
     orderBys?: OrderBy[];
+    groups?: Group[];
 }
